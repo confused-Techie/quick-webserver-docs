@@ -1,6 +1,6 @@
 var fs = require("fs");
 var { parseArgv } = require("./options.js");
-var { genJSON, genMD } = require("./generate.js");
+var { genJSON, genMD, genJSON2, genMD2 } = require("./generate.js");
 const readline = require("readline");
 
 var blockComments = [];
@@ -25,8 +25,10 @@ async function run(rawArgv) {
       // Now webComments should contain an array of arrays, each individual array being the lines of an @web comment.
       // Now we can parse the syntax, to create the objects needed.
 
-      var parsedJSON = await genJSON(webComments);
-      var parsedMD = await genMD(parsedJSON);
+      //var parsedJSON = await genJSON(webComments);
+      var parsedJSON = await genJSON2(webComments);
+      var parsedMD = await genMD2(parsedJSON);
+      //var parsedMD = await genMD(parsedJSON);
       //console.log(parsedMD);
 
       // once it is all done, lets write the file.

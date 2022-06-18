@@ -1,3 +1,5 @@
+var { lookupStatus } = require("./lookups.js");
+
 function genJSON(obj) {
   // this will take the 2d array object from the original text, and attempt at generating JSON from it.
   var final = [];
@@ -72,6 +74,97 @@ function genJSON(obj) {
   return final;
 }
 
+function genJSON2(obj) {
+  // this is the second generation parser, in line with the new definitions.
+  var final = [];
+
+  for (var i = 0; i < obj.length; i++) {
+    var curObj = {};
+
+    var tmpParam = {};
+    var tmpResp = {};
+    var paramActive = false;
+    var respActive = false;
+
+    for (var y = 0; y < obj[i].length; y++) {
+      var cur = obj[i][y];
+
+      if (cur.includes("@path")) {
+        curObj.path = cur.replace("*","").replace("@path","").trim();
+      } else if (cur.includes("@desc")) {
+        curObj.desc = cur.replace("*","").replace("@desc","").trim();
+      } else if (cur.includes("@method")) {
+        curObj.method = cur.replace("*","").replace("@method","").trim();
+      } else if (cur.includes("@todo")) {
+        curObj.todo = cur.replace("*","").replace("@todo","").trim();
+      } else if (cur.includes("@param")) {
+        if (!Array.isArray(curObj.param)) {
+          curObj.param = [ ];
+        } else {
+          // this would mean that param is already an array, and we have initialized it once,
+          // and we are hitting param again, which is likely another definition.
+          // so we will take whatever is in tmpParam and push it to the array.
+          curObj.param.push(tmpParam);
+          tmpParam = {};
+        }
+      } else if (cur.includes("@response")) {
+        if (!Array.isArray(curObj.response)) {
+          curObj.response = [ ];
+        } else {
+          curObj.response.push(tmpResp);
+          tmpResp = {};
+        }
+      } else if (cur.includes("@location")) {
+        tmpParam.location = cur.replace("*","").replace("@location","").trim();
+      } else if (cur.includes("@Ptype")) {
+        tmpParam.type = cur.replace("*","").replace("@Ptype","").trim();
+      } else if (cur.includes("@default")) {
+        tmpParam.default = cur.replace("*","").replace("@default","").trim();
+      } else if (cur.includes("@name")) {
+        tmpParam.name = cur.replace("*","").replace("@name","").trim();
+      } else if (cur.includes("@valid")) {
+        tmpParam.valid = cur.replace("*","").replace("@valid","").trim();
+      } else if (cur.includes("@Pdesc")) {
+        tmpParam.desc = cur.replace("*","").replace("@Pdesc","").trim();
+      } else if (cur.includes("@Pexample")) {
+        tmpParam.example = cur.replace("*","").replace("@example","").trim();
+      } else if (cur.includes("@required")) {
+        if (cur.includes("true") || cur.includes("TRUE")) {
+          tmpParam.required = true;
+        } else if (cur.includes("false") || cur.includes("FALSE")) {
+          tmpParam.required = false;
+        }
+      } else if (cur.includes("@auth")) {
+        if (cur.includes("true") || cur.includes("TRUE")) {
+          curObj.auth = true;
+        } else if (cur.includes("false") || cur.includes("FALSE")) {
+          curObj.auth = false;
+        }
+      } else if (cur.includes("@status")) {
+        tmpResp.status = cur.replace("*","").replace("@status","").trim();
+      } else if (cur.includes("@Rtype")) {
+        tmpResp.type = cur.replace("*","").replace("@Rtype","").trim();
+      } else if (cur.includes("@Rdesc")) {
+        tmpResp.desc = cur.replace("*","").replace("@Rdesc","").trim();
+      } else if (cur.includes("@Rexample")) {
+        tmpResp.example = cur.replace("*","").replace("@Rexample","").trim();
+      }
+    }
+    // we also wanna make sure that we push any leftover params or responses into the object.
+    var isParamEmpty = Object.keys(tmpParam).length === 0;
+    if (!isParamEmpty) {
+      curObj.param.push(tmpParam);
+    }
+    var isRespEmpty = Object.keys(tmpResp).length === 0;
+    if (!isRespEmpty) {
+      curObj.response.push(tmpResp);
+    }
+    final.push(curObj);
+  }
+
+  return final;
+}
+
 function genMD(obj) {
   // this expects to be handed the JSON from the above function directly, and will build a string of MarkDown syntax accordingly.
   var final = '';
@@ -114,4 +207,38 @@ function genMD(obj) {
   return final;
 }
 
-module.exports = { genJSON, genMD };
+function genMD2(obj) {
+  var final = '';
+
+  for (var i = 0; i < obj.length; i++) {
+    final += `# **[${obj[i].method}]** ${obj[i].path}\n${obj[i].desc}\n\n`;
+
+    if (obj[i].todo) { final += `Todo: ${obj[i].todo}\n`; }
+
+    if (obj[i].auth) { final += `Auth: \`${obj[i].auth}\`\n`; } else { final += `Auth: \`FALSE\`\n`; }
+
+    if (obj[i].param) {
+      final += `Parameters:\n---\n`;
+      for (var y = 0; y < obj[i].param.length; y++) {
+        final +=
+          `* ${obj[i].param[y].name} ${obj[i].param[y].required ? `_(required)_` : `_(optional)_`} ${obj[i].param[y].type ? `\`[${obj[i].param[y].type}]\`` : ''} ${obj[i].param[y].default ? `| Defaults: \`${obj[i].param[y].default}\`` : ''} ${obj[i].param[y].valid ? `| Valid: \`[${obj[i].param[y].valid}]\`` : ''}\n${obj[i].param[y].desc ? `  - ${obj[i].param[y].desc}\n\n` : `\n\n`}`;
+        final += `\n---\n`;
+      }
+    }
+
+    if (obj[i].response) {
+      final += `Responses:\n---\n`;
+      for (var y = 0; y < obj[i].response.length; y++) {
+        if (obj[i].response[y].status) { final += `**HTTP Status Code:** \`${obj[i].response[y].status} ${lookupStatus(obj[i].response[y].status)}\`\n\n`; }
+        if (obj[i].response[y].type) { final += `**Type:** \`[${obj[i].response[y].type}]\`\n\n`; }
+        if (obj[i].response[y].desc) { final += `${obj[i].response[y].desc}\n\n`; }
+        if (obj[i].response[y].example) { final += `\`\`\`json\n${obj[i].response[y].example}\n\`\`\`\n\n`; }
+        final += `\n---\n`;
+      }
+    }
+
+  }
+  return final;
+}
+
+module.exports = { genJSON, genMD, genJSON2, genMD2 };

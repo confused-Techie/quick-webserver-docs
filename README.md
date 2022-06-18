@@ -28,7 +28,7 @@ Then add the following into your package.json file.
 
 ```json
 "scripts": {
-  "doc": "node quick-webserver-docs -i ./input/file.js -o ./output/file.md"
+  "doc": "quick-webserver-docs -i ./input/file.js -o ./output/file.md"
 }
 ```
 
@@ -40,51 +40,74 @@ npm run doc
 
 ## Syntax
 
-* \@web: Specifies that the following Block Comment is intended for Quick-WebServer-Docs
+The syntax has recently been rewritten with many breaking changes.
+
+* \@web: Specifies that the following Block Comment is intended for Quick-WebServer-Docs.
 * \@path: The path this block comment documents.
-* \@desc: A description for the endpoint. Any special notes for the endpoint should be put here.
+* \@desc: The description for the endpoint. Any special notes for the endpoint should be put here.
 * \@method: The Method for this endpoint.
-* \@paramdef: Any parameters available for this endpoint CONTAINING default values.
-
-  - {} Brackets can be used to define the location of the Query Parameter and/or type. The first value in the brackets is to indicate the location of the parameter, if including a type add '|' and the type afterwards.
-  - [] Square Brackets can indicate the name of the parameter and is required, following the name of the parameter can be an '=' sign, which one indicates that its optional, and additionally whatever is on the other side of the equal sign is used to indicate the default value. Type NULL to indicate if no default is chosen. Alternatively you can use '=' following by multiple values separated only by ',' to indicate valid values.
-  - Finally a '-' with a space on both sides is used to write a description of this parameter.
-
-* \@param: Any parameters available for an endpoint, without any defaults.
-
-  - This matches almost exactly with \@paramdef EXCEPT it will fail from getting a '=' in the param name field. Expecting there are no defaults.
-
-* \@response: Define a response this endpoint can return.
-
-  - {} Brackets can be used to return the HTTP Status Code of this specific response.
-  - [] Square Brackets can be used to define what type of data is returned.
-  - Finally a '-' with a space on both sides is used to write a description of this response.
-
-### Valid Syntax Values:
-
-* Parameter Location: query, header, path, cookie
-* Data Type:
+* \@todo: Any notes about what is left todo for this endpoint.
+* \@auth: A boolean (true|TRUE false|FALSE) to indicate if authentication is required.
+* \@param: This is the header to start defining a single parameter. Each new parameter needs a new \@param header.
+  - \@location: The location of the parameter. Recommended values: query, header, path, cookie.
+  - \@Ptype: Since type is duplicated for different fields, a parameter type is Ptype. Being the type of data this is expected to receive. Such as string, integer and so on.
+  - \@default: The default value for this specific parameter, if there is none, this field can be left out entirely.
+  - \@name: The name of this parameter.
+  - \@valid: A list of valid values for this parameter.
+  - \@Pdesc: A description for this parameter.
+  - \@Pexample: A short one lined example for the parameter.
+  - \@required: A boolean (true|TRUE false|FALSE) to indicate if this parameter is required.
+* \@response: Header to define a single response. Each new response needs a new \@response header.
+  - \@status: The status code returned by this response. A lookup of the numeric code will be done automatically to include the text representation as well.
+  - \@Rtype: The type of data returned by the response. eg. application/json
+  - \@Rdesc: A short description of the returned data.
+  - \@Rexample: A single line example of the data returned.
 
 ## Examples
 
 ```javascript
 /**
 * @web
+* @desc Hello world
 * @path /api/packages
 * @method GET
-* @desc A Short Description
-* @param {query|integer} [page=1] - Indicate what page number to return.
-* @response {200} [application/json] - Array of Package Objects.
+* @auth true
+* @param
+*   @location query
+*   @Ptype application/json
+*   @name page
+*   @valid 1,2,3,4
+*   @required true
+*   @Pdesc Hello world from a query parameter.
+* @response
+*   @status 418
+*   @Rtype application/json
+*   @Rdesc Hello world response
+*   @Rexample {[ "name": "hello-world"]}
 */
 ```
 
-### **[GET]** /api/packages
-A Short Description
+Creates:
 
-| Param | Location | Type | Required | Default |
-| - | - | - | - | - |
-| page | Query | `integer` | False | 1 |
+---
 
-| Responses | Status Code | Type |
-| - | - | - |
-| Array of Package Objects | **200** | `application/json` |
+# **[GET]** /api/packages
+Hello world
+
+Auth: `true`
+Parameters:
+---
+* page _(required)_ `[application/json]`  | Valid: `[1,2,3,4]`
+  - Hello world from a query parameter.
+
+Responses:
+---
+**HTTP Status Code:** `418 I'm a teapot`
+
+**Type:** `[application/json]`
+
+Hello world response
+
+```json
+{[ "name": "hello-world" ]}
+```
