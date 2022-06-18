@@ -1,0 +1,13 @@
+{
+  "name": "QuickWebserverDocs",
+  "version": "0.0.1",
+  "description": "",
+  "bin": {
+    "quick-webserver-docs": "bin/index.js"
+  },
+  "author": "confused-Techie",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "readline": "^1.3.0"
+  }
+}
