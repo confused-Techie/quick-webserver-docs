@@ -13,10 +13,30 @@ If at any point some more complex declarations are giving you issues you can ref
 ## Installation
 
 ```bash
-
+npm install @confused-techie/quick-webserver-docs
 ```
 
 ## Usage
+
+To add this as an NPM script for your project:
+
+```bash
+npm install @confused-techie/quick-webserver-docs --save-dev
+```
+
+Then add the following into your package.json file.
+
+```json
+"scripts": {
+  "doc": "node quick-webserver-docs -i ./input/file.js -o ./output/file.md"
+}
+```
+
+And to create your new Documentation file:
+
+```bash
+npm run doc
+```
 
 ## Syntax
 

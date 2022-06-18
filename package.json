@@ -1,11 +1,12 @@
 {
-  "name": "QuickWebserverDocs",
+  "name": "@confused-techie/quick-webserver-docs",
   "version": "0.0.1",
-  "description": "",
+  "description": "Quickly make JS API Docs in Markdown",
   "bin": {
     "quick-webserver-docs": "bin/index.js"
   },
   "author": "confused-Techie",
+  "homepage": "https://github.com/confused-Techie/quick-webserver-docs",
   "license": "GPL-3.0",
   "dependencies": {
     "readline": "^1.3.0"
