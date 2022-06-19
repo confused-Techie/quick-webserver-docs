@@ -213,7 +213,7 @@ function genMD2(obj) {
   for (var i = 0; i < obj.length; i++) {
     final += `# **[${obj[i].method}]** ${obj[i].path}\n${obj[i].desc}\n\n`;
 
-    if (obj[i].todo) { final += `Todo: ${obj[i].todo}\n`; }
+    if (obj[i].todo) { final += `Todo: ${obj[i].todo}\n\n`; }
 
     if (obj[i].auth) { final += `Auth: \`${obj[i].auth}\`\n`; } else { final += `Auth: \`FALSE\`\n`; }
 
@@ -221,7 +221,7 @@ function genMD2(obj) {
       final += `Parameters:\n---\n`;
       for (var y = 0; y < obj[i].param.length; y++) {
         final +=
-          `* ${obj[i].param[y].name} ${obj[i].param[y].required ? `_(required)_` : `_(optional)_`} ${obj[i].param[y].type ? `\`[${obj[i].param[y].type}]\`` : ''} ${obj[i].param[y].default ? `| Defaults: \`${obj[i].param[y].default}\`` : ''} ${obj[i].param[y].valid ? `| Valid: \`[${obj[i].param[y].valid}]\`` : ''}\n${obj[i].param[y].desc ? `  - ${obj[i].param[y].desc}\n\n` : `\n\n`}`;
+          `* ${obj[i].param[y].name} ${obj[i].param[y].required ? `_(required)_` : `_(optional)_`} ${obj[i].param[y].type ? `\`[${obj[i].param[y].type}]\`` : ''} ${obj[i].param[y].location ? `| Location: \`${obj[i].param[y].location}\`` : ''} ${obj[i].param[y].default ? `| Defaults: \`${obj[i].param[y].default}\`` : ''} ${obj[i].param[y].valid ? `| Valid: \`[${obj[i].param[y].valid}]\`` : ''}\n${obj[i].param[y].desc ? `  - ${obj[i].param[y].desc}\n\n` : `\n\n`}`;
         final += `\n---\n`;
       }
     }

@@ -1,6 +1,6 @@
 {
   "name": "@confused-techie/quick-webserver-docs",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Quickly make JS API Docs in Markdown",
   "bin": {
     "quick-webserver-docs": "bin/index.js"
