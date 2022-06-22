@@ -2,6 +2,7 @@ var test = false;
 
 /**
 * @web
+* @ignore
 * @desc Hello world
 * @path /api/packages
 * @method GET
@@ -32,5 +33,7 @@ function parse() {
 }
 
 /**
-* @jsdoc
+* @desc Testing testing JSDocs including in the same source.
+* @param {string} token description
+* @param {function} [callback] optional description parameter.
 */

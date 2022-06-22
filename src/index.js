@@ -53,12 +53,12 @@ var parseLineHasCurrent = false;
 function parseLine(line) {
   // Ideally this will create an array for each new block comment syntax found, and if a previous block comment syntax hasn't been closed will add the line to an array
   // of that block comment.
-  if (line.startsWith("/**")) {
+  if (line.includes("/**")) {
     parseLineHasCurrent = true;
     blockComments.push([]);
-  } else if (line.startsWith("*/")) {
+  } else if (line.includes("*/")) {
     parseLineHasCurrent = false;
-  } else if (line.startsWith("*")) {
+  } else if (line.includes("*")) {
     if (parseLineHasCurrent) {
       blockComments[blockComments.length-1].push(line);
     }
@@ -68,8 +68,13 @@ function parseLine(line) {
 async function prune() {
   // this is intended to prune any block comments, that don't have an @web definition
   for (var i = 0; i < blockComments.length; i++) {
-    if (blockComments[i][0].includes("@web")) {
-      webComments.push(blockComments[i]);
+    try {
+      if (blockComments[i][0].includes("@web")) {
+        webComments.push(blockComments[i]);
+      }
+    } catch(err) {
+      console.error(`Unable to prune document: ${blockComments[i][0]}`);
+      continue;
     }
   }
 }

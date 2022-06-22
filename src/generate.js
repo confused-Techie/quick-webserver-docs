@@ -89,6 +89,12 @@ function genJSON2(obj) {
     for (var y = 0; y < obj[i].length; y++) {
       var cur = obj[i][y];
 
+      if (typeof cur === "undefined") {
+        // since this is causing an unknown crash when generating docs, here is a stop gap
+        // until there is time for proper investigation.
+        continue;
+      }
+
       if (cur.includes("@path")) {
         curObj.path = cur.replace("*","").replace("@path","").trim();
       } else if (cur.includes("@desc")) {
